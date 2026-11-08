@@ -1,0 +1,12 @@
+# Single source of truth for which model version each engine serves.
+# The API reads this at startup. To roll back, change the version here.
+engines:
+  ragtruth:
+    active_version: v0.1.0
+    path: models/ragtruth/v0.1.0
+  nab:
+    active_version: v0.1.0
+    path: models/nab/v0.1.0
+  smd:
+    active_version: v0.1.0
+    path: models/smd/v0.1.0

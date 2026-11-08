@@ -1,0 +1,269 @@
+{
+    "engine":  "nab",
+    "version":  "v0.1.0",
+    "created":  "2026-11-08",
+    "purpose":  "Detect anomalies in single time-series system metrics (Numenta Anomaly Benchmark)",
+    "model_type":  "one joblib model + config per NAB series (see *_config.json)",
+    "series":  [
+                   "art_daily_jumpsdown",
+                   "art_daily_jumpsup",
+                   "art_daily_small_noise",
+                   "cpu_utilization_asg_misconfiguration",
+                   "ec2_cpu_utilization_5f5533",
+                   "ec2_disk_write_bytes_1ef3de",
+                   "ec2_network_in_5abac7",
+                   "ec2_request_latency_system_failure",
+                   "machine_temperature_system_failure"
+               ],
+    "metrics":  [
+                    {
+                        "file":  "art_daily_jumpsdown.csv",
+                        "design":  "fixed",
+                        "threshold":  "-0.0144",
+                        "precision":  "0.062",
+                        "recall":  "0.002",
+                        "f1":  "0.005",
+                        "false_alarm_rate":  "0.0062",
+                        "false_alarms_per_day":  "1.78",
+                        "windows":  "1",
+                        "detected":  "1",
+                        "mean_lag_frac":  "0.05",
+                        "flagged_pct":  "0.57"
+                    },
+                    {
+                        "file":  "art_daily_jumpsup.csv",
+                        "design":  "fixed",
+                        "threshold":  "0.0025",
+                        "precision":  "0.143",
+                        "recall":  "0.005",
+                        "f1":  "0.01",
+                        "false_alarm_rate":  "0.005",
+                        "false_alarms_per_day":  "1.43",
+                        "windows":  "1",
+                        "detected":  "1",
+                        "mean_lag_frac":  "0.5",
+                        "flagged_pct":  "0.5"
+                    },
+                    {
+                        "file":  "art_daily_small_noise.csv",
+                        "design":  "fixed",
+                        "threshold":  "-0.0037",
+                        "precision":  "",
+                        "recall":  "",
+                        "f1":  "",
+                        "false_alarm_rate":  "0.006",
+                        "false_alarms_per_day":  "1.73",
+                        "windows":  "0",
+                        "detected":  "0",
+                        "mean_lag_frac":  "",
+                        "flagged_pct":  "0.6"
+                    },
+                    {
+                        "file":  "cpu_utilization_asg_misconfiguration.csv",
+                        "design":  "fixed",
+                        "threshold":  "0.0159",
+                        "precision":  "0.412",
+                        "recall":  "0.081",
+                        "f1":  "0.135",
+                        "false_alarm_rate":  "0.0155",
+                        "false_alarms_per_day":  "4.47",
+                        "windows":  "1",
+                        "detected":  "1",
+                        "mean_lag_frac":  "0.01",
+                        "flagged_pct":  "2.33"
+                    },
+                    {
+                        "file":  "ec2_cpu_utilization_5f5533.csv",
+                        "design":  "fixed",
+                        "threshold":  "-0.0152",
+                        "precision":  "0.095",
+                        "recall":  "0.522",
+                        "f1":  "0.161",
+                        "false_alarm_rate":  "0.815",
+                        "false_alarms_per_day":  "234.71",
+                        "windows":  "2",
+                        "detected":  "2",
+                        "mean_lag_frac":  "0.12",
+                        "flagged_pct":  "77.39"
+                    },
+                    {
+                        "file":  "ec2_disk_write_bytes_1ef3de.csv",
+                        "design":  "fixed",
+                        "threshold":  "0.014",
+                        "precision":  "0.174",
+                        "recall":  "0.017",
+                        "f1":  "0.031",
+                        "false_alarm_rate":  "0.0134",
+                        "false_alarms_per_day":  "3.85",
+                        "windows":  "1",
+                        "detected":  "1",
+                        "mean_lag_frac":  "0.36",
+                        "flagged_pct":  "1.39"
+                    },
+                    {
+                        "file":  "ec2_network_in_5abac7.csv",
+                        "design":  "fixed",
+                        "threshold":  "0.014",
+                        "precision":  "0.333",
+                        "recall":  "0.017",
+                        "f1":  "0.032",
+                        "false_alarm_rate":  "0.0056",
+                        "false_alarms_per_day":  "1.62",
+                        "windows":  "2",
+                        "detected":  "2",
+                        "mean_lag_frac":  "0.25",
+                        "flagged_pct":  "0.72"
+                    },
+                    {
+                        "file":  "ec2_request_latency_system_failure.csv",
+                        "design":  "W1440",
+                        "threshold":  "0.0419",
+                        "precision":  "0.571",
+                        "recall":  "0.012",
+                        "f1":  "0.023",
+                        "false_alarm_rate":  "0.0012",
+                        "false_alarms_per_day":  "0.35",
+                        "windows":  "3",
+                        "detected":  "2",
+                        "mean_lag_frac":  "0.5",
+                        "flagged_pct":  "0.25"
+                    },
+                    {
+                        "file":  "machine_temperature_system_failure.csv",
+                        "design":  "fixed",
+                        "threshold":  "0.0097",
+                        "precision":  "0.531",
+                        "recall":  "0.042",
+                        "f1":  "0.078",
+                        "false_alarm_rate":  "0.0046",
+                        "false_alarms_per_day":  "1.32",
+                        "windows":  "4",
+                        "detected":  "4",
+                        "mean_lag_frac":  "0.37",
+                        "flagged_pct":  "0.87"
+                    }
+                ],
+    "limitations":  [
+                        "Models are per-series, trained on a 70/30 split of each series",
+                        "Predefined samples used in the UI demo"
+                    ],
+    "python_version":  "3.12.10",
+    "mlflow_run_id":  null,
+    "files":  [
+                  {
+                      "path":  "art_daily_jumpsdown_config.json",
+                      "size_mb":  0,
+                      "sha256":  "F572D0B4F946AB64E4B902FCFB9ACD4F47F3B0D9087FF319593397FBD970F155"
+                  },
+                  {
+                      "path":  "art_daily_jumpsdown_model.joblib",
+                      "size_mb":  2.61,
+                      "sha256":  "F2407CBD8BC69F5072A6DB76254EC41EBBBED8787CFDD3A4D9CE72A996AD49FA"
+                  },
+                  {
+                      "path":  "art_daily_jumpsup_config.json",
+                      "size_mb":  0,
+                      "sha256":  "5576179FE4D6A84CF1F8C861F134F2A7DFCD23B5C0EF2588468C2A4F30A17FAF"
+                  },
+                  {
+                      "path":  "art_daily_jumpsup_model.joblib",
+                      "size_mb":  2.6,
+                      "sha256":  "3125DD8485C1AFDDB5A28A47F0EE3FFBCE041884519A50EB0BC625D1737A0C57"
+                  },
+                  {
+                      "path":  "art_daily_small_noise_config.json",
+                      "size_mb":  0,
+                      "sha256":  "72EF51C7D52FA115DA1CD9AFC42C2C6820B64E1CA8DC92D06D5A06EEDADFC156"
+                  },
+                  {
+                      "path":  "art_daily_small_noise_model.joblib",
+                      "size_mb":  2.58,
+                      "sha256":  "1963ECF75294762959BFAF79DDBFE8D496C9009BF58D96F6AEC25FC238748B11"
+                  },
+                  {
+                      "path":  "cpu_utilization_asg_misconfiguration_config.json",
+                      "size_mb":  0,
+                      "sha256":  "F99F9F1A1C23F88DF41BDC1F2849E8FBA239476C57F0043596162FB57259DDA4"
+                  },
+                  {
+                      "path":  "cpu_utilization_asg_misconfiguration_model.joblib",
+                      "size_mb":  2.41,
+                      "sha256":  "EE07666ECF0671FDA4711A768B869624D4482C278CC420A137E2DC0AA02865E3"
+                  },
+                  {
+                      "path":  "ec2_cpu_utilization_5f5533_config.json",
+                      "size_mb":  0,
+                      "sha256":  "DA2608A1D401C8D711E9CE4E7EBD601952B5B9DE3DED1E7CF9572F01CF8A3FB4"
+                  },
+                  {
+                      "path":  "ec2_cpu_utilization_5f5533_model.joblib",
+                      "size_mb":  2.61,
+                      "sha256":  "6E76918F67B5922DD9B7F0B11E2B5A192B5794BB6DCCEAA189FB7C9F5814C714"
+                  },
+                  {
+                      "path":  "ec2_disk_write_bytes_1ef3de_config.json",
+                      "size_mb":  0,
+                      "sha256":  "1786C721D4917D834604FC22DC1858544DF2499208AAF105FE5439295E0E0ADA"
+                  },
+                  {
+                      "path":  "ec2_disk_write_bytes_1ef3de_model.joblib",
+                      "size_mb":  1.22,
+                      "sha256":  "951F403740C7CC612720B9F56E8D417C4863DAD69B9E985AEEBEC831DF535736"
+                  },
+                  {
+                      "path":  "ec2_network_in_5abac7_config.json",
+                      "size_mb":  0,
+                      "sha256":  "4D4A3DF6657148D91E8DA832AB6C4EB824F5D0B731ED3EF9D617CF86BEC3BBF7"
+                  },
+                  {
+                      "path":  "ec2_network_in_5abac7_model.joblib",
+                      "size_mb":  1.48,
+                      "sha256":  "7726568974FF88F210497270765832AEB264581F8541F58578A7C567C1E1696E"
+                  },
+                  {
+                      "path":  "ec2_request_latency_system_failure_config.json",
+                      "size_mb":  0,
+                      "sha256":  "8F00878C8F2B876EDA02D73045275371C8C974C84D579725D2FB5FA6ABAEBE4A"
+                  },
+                  {
+                      "path":  "ec2_request_latency_system_failure_model.joblib",
+                      "size_mb":  0.96,
+                      "sha256":  "0F1354BE8DEF38059871557F1A208BF26051304E3F4C05A4D3E21C265BC1D7B3"
+                  },
+                  {
+                      "path":  "machine_temperature_system_failure_config.json",
+                      "size_mb":  0,
+                      "sha256":  "10FC132D08EB1244E8B7D5A6C3A45EDFEC9473D89D83E8EA7BA183BC2A0FA876"
+                  },
+                  {
+                      "path":  "machine_temperature_system_failure_model.joblib",
+                      "size_mb":  2.48,
+                      "sha256":  "15FC1B398CB48520972D1929B7A48887EBA99BE5D85A01E15B413AD8A60E3B6C"
+                  },
+                  {
+                      "path":  "evaluation/all_designs_metrics.csv",
+                      "size_mb":  0,
+                      "sha256":  "78E6E8DD914036B9C4440132E1036A7CB652CF4000EB3DB1BD0B906E9B3363C1"
+                  },
+                  {
+                      "path":  "evaluation/final_metrics.csv",
+                      "size_mb":  0,
+                      "sha256":  "6EA05D5627A64A3BE7846CA12D8B98E84449E1835E69A7745039B1D2AA1D39F1"
+                  },
+                  {
+                      "path":  "evaluation/final_metrics_with_verdict.csv",
+                      "size_mb":  0,
+                      "sha256":  "28C856AF9AF12FE1A39D09E848CACCB5496E593CC760C3E0481D99E6076D5A49"
+                  },
+                  {
+                      "path":  "evaluation/REPORT.md",
+                      "size_mb":  0.01,
+                      "sha256":  "DFD05D472AEB128092298DDF672E8431F68C7424824AB07F99DF1AB10DFEF1F7"
+                  },
+                  {
+                      "path":  "evaluation/split_manifest.csv",
+                      "size_mb":  0,
+                      "sha256":  "F40263884E4B09D0D4B7F5FFA6AFADB8A27A25E47EA4FF0AF89466FC295B5853"
+                  }
+              ]
+}

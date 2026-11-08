@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Secrets / local config
+.env
+
+# MLflow local tracking
+mlruns/
+mlartifacts/
+
+# Raw datasets and cloned upstream repos
+data/
+NAB-master/
+OmniAnomaly-master/
+RAGTruth-main/
+smd_outputs/
+
+# NAB: ignore everything except the prepared scores the app needs
+NAB_outputs/*
+!NAB_outputs/prepared/
+
+# Misc
+*.log
+*.zip
+inventory.txt
+.DS_Store
+notebooks/
+reports/
+
+# Heavy files: stray copies of the original model in the project root
+/model.safetensors
+/config.json
+/tokenizer.json
+/tokenizer_config.json
+/training_args.bin
+
+# Original 571 MB model (only model_fp16 is deployed, tracked by LFS)
+models/ragtruth/v0.1.0/model/
+*.bin
+*.pt
+*.h5

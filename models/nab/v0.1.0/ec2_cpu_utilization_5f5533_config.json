@@ -1,0 +1,27 @@
+{
+  "file": "ec2_cpu_utilization_5f5533.csv",
+  "design": "fixed",
+  "window_rows": null,
+  "refit_step_rows": null,
+  "features": [
+    "value",
+    "roll_mean_s",
+    "roll_std_s",
+    "roll_mean_l",
+    "roll_std_l",
+    "diff_1",
+    "z_short",
+    "dev_long"
+  ],
+  "rolling_short": 12,
+  "rolling_long": 72,
+  "threshold_on_shifted_score": -0.015169242553254355,
+  "ref_of_saved_model": 0.6087189955125009,
+  "target_validation_false_alarm_rate": 0.005,
+  "fit_end_idx": 585,
+  "val_end_idx": 1171,
+  "val_drift_rate": 0.0017064846416382253,
+  "seed": 42,
+  "verdict": "FAILED (alarm flood)",
+  "test_lift_over_base_rate": 0.67
+}

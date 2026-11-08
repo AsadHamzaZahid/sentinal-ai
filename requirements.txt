@@ -1,0 +1,9 @@
+# Runtime. Models were saved with scikit-learn 1.6.1, so pin it for reproducible inference.
+fastapi>=0.110
+uvicorn>=0.29
+numpy
+pandas
+joblib
+scikit-learn==1.6.1
+torch
+transformers

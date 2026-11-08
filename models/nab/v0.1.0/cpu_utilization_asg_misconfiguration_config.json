@@ -1,0 +1,27 @@
+{
+  "file": "cpu_utilization_asg_misconfiguration.csv",
+  "design": "fixed",
+  "window_rows": null,
+  "refit_step_rows": null,
+  "features": [
+    "value",
+    "roll_mean_s",
+    "roll_std_s",
+    "roll_mean_l",
+    "roll_std_l",
+    "diff_1",
+    "z_short",
+    "dev_long"
+  ],
+  "rolling_short": 12,
+  "rolling_long": 72,
+  "threshold_on_shifted_score": 0.015919882716471514,
+  "ref_of_saved_model": 0.6477515985980759,
+  "target_validation_false_alarm_rate": 0.005,
+  "fit_end_idx": 2707,
+  "val_end_idx": 5414,
+  "val_drift_rate": 0.011082379017362394,
+  "seed": 42,
+  "verdict": "credible",
+  "test_lift_over_base_rate": 3.46
+}

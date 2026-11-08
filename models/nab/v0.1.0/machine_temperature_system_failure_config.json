@@ -1,0 +1,27 @@
+{
+  "file": "machine_temperature_system_failure.csv",
+  "design": "fixed",
+  "window_rows": null,
+  "refit_step_rows": null,
+  "features": [
+    "value",
+    "roll_mean_s",
+    "roll_std_s",
+    "roll_mean_l",
+    "roll_std_l",
+    "diff_1",
+    "z_short",
+    "dev_long"
+  ],
+  "rolling_short": 12,
+  "rolling_long": 72,
+  "threshold_on_shifted_score": 0.009684387134411408,
+  "ref_of_saved_model": 0.6268577794607714,
+  "target_validation_false_alarm_rate": 0.005,
+  "fit_end_idx": 1063,
+  "val_end_idx": 2126,
+  "val_drift_rate": 0.00940733772342427,
+  "seed": 42,
+  "verdict": "credible",
+  "test_lift_over_base_rate": 4.83
+}

@@ -1,0 +1,37 @@
+[project]
+name = "sentinelai"
+version = "0.1.0"
+description = "Unified ML monitoring: hallucination detection (RAGTruth), time-series anomalies (NAB), server anomalies (SMD)"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi[standard]",
+    "pydantic>=2",
+    "numpy",
+    "pandas",
+    "scikit-learn",
+    "joblib",
+    "pyyaml",
+    # TODO: add the exact ML libs your models need (torch / tensorflow / transformers ...)
+    # and pin versions from inventory.txt (pip freeze) so builds are reproducible.
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "pytest-cov",
+    "httpx",
+    "ruff",
+    "mlflow",
+]
+
+[tool.fastapi]
+# TODO: point to your real FastAPI app, e.g. "main:app" or "src.sentinelai.api:app"
+entrypoint = "main:app"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+extend-exclude = ["NAB-master", "OmniAnomaly-master", "RAGTruth-main"]

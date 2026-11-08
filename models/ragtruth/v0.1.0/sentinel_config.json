@@ -1,0 +1,34 @@
+{
+  "base_model": "answerdotai/ModernBERT-base",
+  "selected_model": "ModernBERT source-aware (new input)",
+  "input_mode": "source_aware",
+  "input_format": "first segment: 'Task: <task_type>. Source: <source_info>'; second segment: response",
+  "label_map": {
+    "0": "clean",
+    "1": "hallucinated"
+  },
+  "final_threshold": 0.31,
+  "sensitivity_presets": {
+    "Catch as many as possible": 0.25,
+    "Balanced detection": 0.31,
+    "Only flag stronger signals": 0.51
+  },
+  "threshold_selected_on": "validation set (F1)",
+  "max_length": 2048,
+  "truncation": "longest_first (the source text is shortened first)",
+  "training": {
+    "learning_rate": 2e-05,
+    "epochs": 3,
+    "effective_batch_size": 16,
+    "weight_decay": 0.01,
+    "warmup_ratio": 0.1,
+    "fp16": true,
+    "seed": 42,
+    "best_epoch_metric": "pr_auc on validation"
+  },
+  "split": "official train/test; validation = 20% of train grouped by source_id (GroupShuffleSplit, seed 42)",
+  "versions": {
+    "torch": "2.14.1+cu130",
+    "transformers": "5.22.1"
+  }
+}

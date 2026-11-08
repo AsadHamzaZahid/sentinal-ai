@@ -1,0 +1,16 @@
+{
+  "selected_model": "ModernBERT source-aware (new input)",
+  "input_mode": "source_aware",
+  "threshold": 0.31,
+  "selected_on": "validation F1 (threshold also chosen on validation)",
+  "validation_metrics": {
+    "threshold": 0.31,
+    "accuracy": 0.7382372432074221,
+    "precision": 0.6670616113744076,
+    "recall": 0.8316100443131462,
+    "f1": 0.740302432610125,
+    "pr_auc": 0.8193237331129294,
+    "roc_auc": 0.8391078606124305
+  },
+  "validation_f1_gain_source_aware_vs_response_only": 0.027797979457292787
+}

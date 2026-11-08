@@ -1,0 +1,10 @@
+file,train_rows,test_rows,test_anomaly_rows,flagged_pct,duplicate_timestamps,timestamps_sorted,roc_auc,avg_precision,precision,recall,f1,false_alarm_rate
+art_daily_jumpsdown.csv,2750,1210,368,0.33,0,True,0.537,0.345,0.0,0.0,0.0,
+art_daily_jumpsup.csv,2750,1210,368,0.5,0,True,0.627,0.48,0.333,0.005,0.011,
+art_daily_small_noise.csv,2750,1210,0,0.5,0,True,,,,,,0.005
+cpu_utilization_asg_misconfiguration.csv,12563,5415,1499,4.12,0,True,0.853,0.681,0.753,0.112,0.195,
+ec2_cpu_utilization_5f5533.csv,2750,1210,201,1.65,0,True,0.333,0.309,0.9,0.09,0.163,
+ec2_disk_write_bytes_1ef3de.csv,3239,1419,0,1.48,11,True,,,,,,0.0148
+ec2_network_in_5abac7.csv,3239,1419,17,0.99,11,True,0.644,0.017,0.0,0.0,0.0,
+ec2_request_latency_system_failure.csv,2750,1210,211,2.4,11,True,0.754,0.466,0.966,0.133,0.233,
+machine_temperature_system_failure.csv,15814,6809,1134,0.62,12,True,0.924,0.625,0.548,0.02,0.039,

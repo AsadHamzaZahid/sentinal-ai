@@ -1,0 +1,191 @@
+{
+    "engine":  "smd",
+    "version":  "v0.1.0",
+    "created":  "2026-11-08",
+    "purpose":  "Detect unusual patterns across multivariate server metrics (Server Machine Dataset)",
+    "model_type":  "one joblib model bundle per machine (machine-1-1, machine-1-2, machine-1-3)",
+    "features":  "21 of 38 metrics used",
+    "metrics":  [
+                    {
+                        "machine":  "machine-1-1",
+                        "model":  "OCSVM nu=0.01",
+                        "flagged_%":  "5.0",
+                        "precision":  "0.791",
+                        "recall":  "0.418",
+                        "F1":  "0.547",
+                        "PA_F1":  "0.946",
+                        "ROC_AUC":  "0.863",
+                        "PR_AUC":  "0.516",
+                        "best_F1_oracle":  "0.549",
+                        "segments_hit":  "5/8"
+                    },
+                    {
+                        "machine":  "machine-1-1",
+                        "model":  "OCSVM nu=0.05",
+                        "flagged_%":  "5.0",
+                        "precision":  "0.748",
+                        "recall":  "0.395",
+                        "F1":  "0.517",
+                        "PA_F1":  "0.936",
+                        "ROC_AUC":  "0.867",
+                        "PR_AUC":  "0.508",
+                        "best_F1_oracle":  "0.556",
+                        "segments_hit":  "5/8"
+                    },
+                    {
+                        "machine":  "machine-1-1",
+                        "model":  "IsolationForest",
+                        "flagged_%":  "5.0",
+                        "precision":  "0.462",
+                        "recall":  "0.244",
+                        "F1":  "0.32",
+                        "PA_F1":  "0.874",
+                        "ROC_AUC":  "0.891",
+                        "PR_AUC":  "0.429",
+                        "best_F1_oracle":  "0.495",
+                        "segments_hit":  "5/8"
+                    },
+                    {
+                        "machine":  "machine-1-2",
+                        "model":  "OCSVM nu=0.01",
+                        "flagged_%":  "5.0",
+                        "precision":  "0.264",
+                        "recall":  "0.577",
+                        "F1":  "0.362",
+                        "PA_F1":  "0.548",
+                        "ROC_AUC":  "0.841",
+                        "PR_AUC":  "0.438",
+                        "best_F1_oracle":  "0.471",
+                        "segments_hit":  "8/10"
+                    },
+                    {
+                        "machine":  "machine-1-2",
+                        "model":  "OCSVM nu=0.05",
+                        "flagged_%":  "5.0",
+                        "precision":  "0.269",
+                        "recall":  "0.589",
+                        "F1":  "0.369",
+                        "PA_F1":  "0.55",
+                        "ROC_AUC":  "0.864",
+                        "PR_AUC":  "0.426",
+                        "best_F1_oracle":  "0.465",
+                        "segments_hit":  "8/10"
+                    },
+                    {
+                        "machine":  "machine-1-2",
+                        "model":  "IsolationForest",
+                        "flagged_%":  "5.0",
+                        "precision":  "0.263",
+                        "recall":  "0.576",
+                        "F1":  "0.361",
+                        "PA_F1":  "0.548",
+                        "ROC_AUC":  "0.927",
+                        "PR_AUC":  "0.436",
+                        "best_F1_oracle":  "0.489",
+                        "segments_hit":  "8/10"
+                    },
+                    {
+                        "machine":  "machine-1-3",
+                        "model":  "OCSVM nu=0.01",
+                        "flagged_%":  "5.0",
+                        "precision":  "0.176",
+                        "recall":  "0.256",
+                        "F1":  "0.209",
+                        "PA_F1":  "0.547",
+                        "ROC_AUC":  "0.777",
+                        "PR_AUC":  "0.145",
+                        "best_F1_oracle":  "0.229",
+                        "segments_hit":  "6/12"
+                    },
+                    {
+                        "machine":  "machine-1-3",
+                        "model":  "OCSVM nu=0.05",
+                        "flagged_%":  "5.0",
+                        "precision":  "0.171",
+                        "recall":  "0.248",
+                        "F1":  "0.203",
+                        "PA_F1":  "0.571",
+                        "ROC_AUC":  "0.785",
+                        "PR_AUC":  "0.146",
+                        "best_F1_oracle":  "0.236",
+                        "segments_hit":  "7/12"
+                    },
+                    {
+                        "machine":  "machine-1-3",
+                        "model":  "IsolationForest",
+                        "flagged_%":  "5.0",
+                        "precision":  "0.243",
+                        "recall":  "0.353",
+                        "F1":  "0.288",
+                        "PA_F1":  "0.607",
+                        "ROC_AUC":  "0.811",
+                        "PR_AUC":  "0.308",
+                        "best_F1_oracle":  "0.315",
+                        "segments_hit":  "9/12"
+                    }
+                ],
+    "limitations":  [
+                        "Uses only 21 of the 38 available metrics",
+                        "Only 3 machines covered",
+                        "Predefined samples used in the UI demo"
+                    ],
+    "python_version":  "3.12.10",
+    "mlflow_run_id":  null,
+    "files":  [
+                  {
+                      "path":  "machine-1-1_models.joblib",
+                      "size_mb":  3.45,
+                      "sha256":  "E0CF5834C3237EF4BF07FB476DE9C1548214E3C8A8475CE299665BC768B3B4B1"
+                  },
+                  {
+                      "path":  "machine-1-2_models.joblib",
+                      "size_mb":  2.55,
+                      "sha256":  "5F104EF23A053878F0A393DD44AF4DEF3D05C559CC47A9A7A35ED4AC0384B9FB"
+                  },
+                  {
+                      "path":  "machine-1-3_models.joblib",
+                      "size_mb":  3.11,
+                      "sha256":  "CCC2FC60CD9580D54236DDEEEF3355AAF46B8631D8BE4C687200750AC8676CB8"
+                  },
+                  {
+                      "path":  "evaluation/data_summary.csv",
+                      "size_mb":  0,
+                      "sha256":  "5301D96BFABC8310BE9FBB3CB85C8123C4A3A9894AEEBF78C21E3B7C7A22EE82"
+                  },
+                  {
+                      "path":  "evaluation/final_report.md",
+                      "size_mb":  0.01,
+                      "sha256":  "A1B076CB43AEBCF5831594CABEDBE87B10861B773718FF8F22AAE806D2F49E55"
+                  },
+                  {
+                      "path":  "evaluation/final_results.csv",
+                      "size_mb":  0,
+                      "sha256":  "20BE155CC47890135DACF6C4ADA5A1E0226CE838FCCDF77B145EFB7DFED4E63B"
+                  },
+                  {
+                      "path":  "evaluation/iforest_seed_results.csv",
+                      "size_mb":  0,
+                      "sha256":  "401C44122F16834911D34A47F3095169914FDF453A74C0AF5CE42F4E598EEDB6"
+                  },
+                  {
+                      "path":  "evaluation/iforest_stability_summary.csv",
+                      "size_mb":  0,
+                      "sha256":  "8EB52B00C72966962C644B26CF4007A9DA45A5414669BDBBA5AAFE4CC1164529"
+                  },
+                  {
+                      "path":  "evaluation/METHODOLOGY.md",
+                      "size_mb":  0,
+                      "sha256":  "49C6CD918A6677A62CDFA9337A273E8BFCB84B7E8E4F94BE02EDFA18967E3A1C"
+                  },
+                  {
+                      "path":  "evaluation/methodology_checks.csv",
+                      "size_mb":  0,
+                      "sha256":  "DF5D6876C44DD70F30FB1BAF85CAB051015DB9589FC8B29630458B7D9BC9E45F"
+                  },
+                  {
+                      "path":  "evaluation/model_overlap.csv",
+                      "size_mb":  0,
+                      "sha256":  "D596135555F218D5F0EB46E837D8604FB81E0A154C43931BADDC40FA61F7FEAF"
+                  }
+              ]
+}

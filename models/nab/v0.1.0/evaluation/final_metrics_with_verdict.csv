@@ -1,0 +1,10 @@
+file,design,threshold,precision,recall,f1,false_alarm_rate,false_alarms_per_day,windows,detected,mean_lag_frac,flagged_pct,test_rows,test_anom_rows,windows_in_test,base_rate,lift,flagged_rows,tp_rows,chance_hit_prob,verdict
+art_daily_jumpsdown.csv,fixed,-0.0144,0.062,0.002,0.005,0.0062,1.78,1,1,0.05,0.57,2824,403,1,0.143,0.43,16,1.0,0.91,indistinguishable from chance
+art_daily_jumpsup.csv,fixed,0.0025,0.143,0.005,0.01,0.005,1.43,1,1,0.5,0.5,2824,403,1,0.143,1.0,14,2.0,0.88,indistinguishable from chance
+art_daily_small_noise.csv,fixed,-0.0037,,,,0.006,1.73,0,0,,0.6,2824,0,0,0.0,,17,,,control (false alarms only)
+cpu_utilization_asg_misconfiguration.csv,fixed,0.0159,0.412,0.081,0.135,0.0155,4.47,1,1,0.01,2.33,12636,1499,1,0.119,3.46,294,121.0,1.0,credible
+ec2_cpu_utilization_5f5533.csv,fixed,-0.0152,0.095,0.522,0.161,0.815,234.71,2,2,0.12,77.39,2861,402,2,0.141,0.67,2214,210.0,1.0,FAILED (alarm flood)
+ec2_disk_write_bytes_1ef3de.csv,fixed,0.014,0.174,0.017,0.031,0.0134,3.85,1,1,0.36,1.39,3312,473,1,0.143,1.22,46,8.0,1.0,indistinguishable from chance
+ec2_network_in_5abac7.csv,fixed,0.014,0.333,0.017,0.032,0.0056,1.62,2,2,0.25,0.72,3312,474,2,0.143,2.33,24,8.0,0.83,suggestive (few flagged rows)
+ec2_request_latency_system_failure.csv,W1440,0.0419,0.571,0.012,0.023,0.0012,0.35,3,2,0.5,0.25,2824,346,3,0.123,4.64,7,4.0,0.25,suggestive (few flagged rows)
+machine_temperature_system_failure.csv,fixed,0.0097,0.531,0.042,0.078,0.0046,1.32,4,4,0.37,0.87,20569,2268,4,0.11,4.83,179,95.0,0.99,credible

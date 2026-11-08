@@ -1,0 +1,4 @@
+machine,train_rows,test_rows,test_anomaly_rows,actual_flagged_pct,anomaly_prevalence_pct,threshold_method,test_distribution_used,labels_used_for_threshold,train_test_length_match
+machine-1-1,28479,28479,2694,5.0,9.46,Top 5% of test scores,True,False,True
+machine-1-2,23694,23694,542,5.001,2.287,Top 5% of test scores,True,False,True
+machine-1-3,23702,23703,817,5.004,3.447,Top 5% of test scores,True,False,True

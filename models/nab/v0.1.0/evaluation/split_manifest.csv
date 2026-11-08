@@ -1,0 +1,10 @@
+file,fit_end,val_end,val_rows,test_rows,test_anom_rows,windows_in_test,windows_crossing,val_drift_rate,chosen
+art_daily_jumpsdown.csv,604,1208,604,2824,403,1,0,0.002,fixed
+art_daily_jumpsup.csv,604,1208,604,2824,403,1,0,0.007,fixed
+art_daily_small_noise.csv,604,1208,604,2824,0,0,0,0.003,fixed
+cpu_utilization_asg_misconfiguration.csv,2707,5414,2707,12636,1499,1,0,0.011,fixed
+ec2_cpu_utilization_5f5533.csv,585,1171,586,2861,402,2,0,0.002,fixed
+ec2_disk_write_bytes_1ef3de.csv,709,1418,709,3312,473,1,0,0.013,fixed
+ec2_network_in_5abac7.csv,709,1418,709,3312,474,2,0,0.01,fixed
+ec2_request_latency_system_failure.csv,604,1208,604,2824,346,3,0,0.026,W1440
+machine_temperature_system_failure.csv,1063,2126,1063,20569,2268,4,0,0.009,fixed

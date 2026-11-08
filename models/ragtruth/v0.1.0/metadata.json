@@ -1,0 +1,331 @@
+{
+    "engine":  "ragtruth",
+    "version":  "v0.1.0",
+    "created":  "2026-11-08",
+    "purpose":  "Detect potentially hallucinated LLM responses (RAGTruth)",
+    "model_type":  "fine-tuned transformer classifier (Hugging Face safetensors)",
+    "hf_config":  {
+                      "model_type":  "modernbert",
+                      "architectures":  [
+                                            "ModernBertForSequenceClassification"
+                                        ],
+                      "name_or_path":  null,
+                      "id2label":  null
+                  },
+    "sentinel_config":  {
+                            "base_model":  "answerdotai/ModernBERT-base",
+                            "selected_model":  "ModernBERT source-aware (new input)",
+                            "input_mode":  "source_aware",
+                            "input_format":  "first segment: \u0027Task: \u003ctask_type\u003e. Source: \u003csource_info\u003e\u0027; second segment: response",
+                            "label_map":  {
+                                              "0":  "clean",
+                                              "1":  "hallucinated"
+                                          },
+                            "final_threshold":  0.31,
+                            "sensitivity_presets":  {
+                                                        "Catch as many as possible":  0.25,
+                                                        "Balanced detection":  0.31,
+                                                        "Only flag stronger signals":  0.51
+                                                    },
+                            "threshold_selected_on":  "validation set (F1)",
+                            "max_length":  2048,
+                            "truncation":  "longest_first (the source text is shortened first)",
+                            "training":  {
+                                             "learning_rate":  2E-05,
+                                             "epochs":  3,
+                                             "effective_batch_size":  16,
+                                             "weight_decay":  0.01,
+                                             "warmup_ratio":  0.1,
+                                             "fp16":  true,
+                                             "seed":  42,
+                                             "best_epoch_metric":  "pr_auc on validation"
+                                         },
+                            "split":  "official train/test; validation = 20% of train grouped by source_id (GroupShuffleSplit, seed 42)",
+                            "versions":  {
+                                             "torch":  "2.14.1+cu130",
+                                             "transformers":  "5.22.1"
+                                         }
+                        },
+    "selection":  {
+                      "selected_model":  "ModernBERT source-aware (new input)",
+                      "input_mode":  "source_aware",
+                      "threshold":  0.31,
+                      "selected_on":  "validation F1 (threshold also chosen on validation)",
+                      "validation_metrics":  {
+                                                 "threshold":  0.31,
+                                                 "accuracy":  0.7382372432074221,
+                                                 "precision":  0.6670616113744076,
+                                                 "recall":  0.8316100443131462,
+                                                 "f1":  0.740302432610125,
+                                                 "pr_auc":  0.8193237331129294,
+                                                 "roc_auc":  0.8391078606124305
+                                             },
+                      "validation_f1_gain_source_aware_vs_response_only":  0.027797979457292787
+                  },
+    "evaluation":  {
+                       "selected_model":  "ModernBERT source-aware (new input)",
+                       "test_overall":  {
+                                            "threshold":  0.31,
+                                            "accuracy":  0.7303703703703703,
+                                            "precision":  0.5785244704163623,
+                                            "recall":  0.8398727465535525,
+                                            "f1":  0.6851211072664359,
+                                            "pr_auc":  0.7797892407269187,
+                                            "roc_auc":  0.8562085546618254
+                                        },
+                       "test_per_task":  {
+                                             "Data2txt":  {
+                                                              "precision":  0.7687861271676301,
+                                                              "recall":  0.918825561312608,
+                                                              "f1":  0.8371361132966169,
+                                                              "n":  900
+                                                          },
+                                             "QA":  {
+                                                        "precision":  0.411371237458194,
+                                                        "recall":  0.76875,
+                                                        "f1":  0.5359477124183006,
+                                                        "n":  900
+                                                    },
+                                             "Summary":  {
+                                                             "precision":  0.36243386243386244,
+                                                             "recall":  0.6715686274509803,
+                                                             "f1":  0.47079037800687284,
+                                                             "n":  900
+                                                         }
+                                         },
+                       "confusion_matrix":  {
+                                                "labels":  [
+                                                               "Clean",
+                                                               "Hallucinated"
+                                                           ],
+                                                "matrix":  [
+                                                               [
+                                                                   1180,
+                                                                   577
+                                                               ],
+                                                               [
+                                                                   151,
+                                                                   792
+                                                               ]
+                                                           ]
+                                            },
+                       "classification_report":  {
+                                                     "Clean":  {
+                                                                   "precision":  0.8865514650638617,
+                                                                   "recall":  0.6715993170176437,
+                                                                   "f1-score":  0.7642487046632125,
+                                                                   "support":  1757.0
+                                                               },
+                                                     "Hallucinated":  {
+                                                                          "precision":  0.5785244704163623,
+                                                                          "recall":  0.8398727465535525,
+                                                                          "f1-score":  0.6851211072664359,
+                                                                          "support":  943.0
+                                                                      },
+                                                     "accuracy":  0.7303703703703703,
+                                                     "macro avg":  {
+                                                                       "precision":  0.732537967740112,
+                                                                       "recall":  0.7557360317855981,
+                                                                       "f1-score":  0.7246849059648242,
+                                                                       "support":  2700.0
+                                                                   },
+                                                     "weighted avg":  {
+                                                                          "precision":  0.7789701850814204,
+                                                                          "recall":  0.7303703703703703,
+                                                                          "f1-score":  0.7366126586094494,
+                                                                          "support":  2700.0
+                                                                      }
+                                                 },
+                       "validation_comparison":  {
+                                                     "Majority baseline (always Clean)":  {
+                                                                                              "threshold":  0.5,
+                                                                                              "accuracy":  0.5514,
+                                                                                              "precision":  0.0,
+                                                                                              "recall":  0.0,
+                                                                                              "f1":  0.0,
+                                                                                              "pr_auc":  0.4486,
+                                                                                              "f1_at_0.5":  0.0,
+                                                                                              "f1_Data2txt":  0.0,
+                                                                                              "f1_QA":  0.0,
+                                                                                              "f1_Summary":  0.0
+                                                                                          },
+                                                     "TF-IDF + Logistic Regression":  {
+                                                                                          "threshold":  0.36,
+                                                                                          "accuracy":  0.6743,
+                                                                                          "precision":  0.5977,
+                                                                                          "recall":  0.8383,
+                                                                                          "f1":  0.6978,
+                                                                                          "pr_auc":  0.8026,
+                                                                                          "f1_at_0.5":  0.6818,
+                                                                                          "f1_Data2txt":  0.853,
+                                                                                          "f1_QA":  0.5998,
+                                                                                          "f1_Summary":  0.4711
+                                                                                      },
+                                                     "ModernBERT response-only (old input)":  {
+                                                                                                  "threshold":  0.25,
+                                                                                                  "accuracy":  0.7326,
+                                                                                                  "precision":  0.6882,
+                                                                                                  "recall":  0.7386,
+                                                                                                  "f1":  0.7125,
+                                                                                                  "pr_auc":  0.8084,
+                                                                                                  "f1_at_0.5":  0.6615,
+                                                                                                  "f1_Data2txt":  0.8782,
+                                                                                                  "f1_QA":  0.6036,
+                                                                                                  "f1_Summary":  0.4505
+                                                                                              },
+                                                     "ModernBERT source-aware (new input)":  {
+                                                                                                 "threshold":  0.31,
+                                                                                                 "accuracy":  0.7382,
+                                                                                                 "precision":  0.6671,
+                                                                                                 "recall":  0.8316,
+                                                                                                 "f1":  0.7403,
+                                                                                                 "pr_auc":  0.8193,
+                                                                                                 "f1_at_0.5":  0.7118,
+                                                                                                 "f1_Data2txt":  0.8757,
+                                                                                                 "f1_QA":  0.6809,
+                                                                                                 "f1_Summary":  0.5347
+                                                                                             }
+                                                 },
+                       "test_comparison_reporting_only":  {
+                                                              "Majority baseline (always Clean)":  {
+                                                                                                       "threshold":  0.5,
+                                                                                                       "accuracy":  0.6507,
+                                                                                                       "precision":  0.0,
+                                                                                                       "recall":  0.0,
+                                                                                                       "f1":  0.0,
+                                                                                                       "pr_auc":  0.3493,
+                                                                                                       "f1_Data2txt":  0.0,
+                                                                                                       "f1_QA":  0.0,
+                                                                                                       "f1_Summary":  0.0
+                                                                                                   },
+                                                              "TF-IDF + Logistic Regression":  {
+                                                                                                   "threshold":  0.36,
+                                                                                                   "accuracy":  0.6548,
+                                                                                                   "precision":  0.5035,
+                                                                                                   "recall":  0.8335,
+                                                                                                   "f1":  0.6278,
+                                                                                                   "pr_auc":  0.7561,
+                                                                                                   "f1_Data2txt":  0.8143,
+                                                                                                   "f1_QA":  0.4207,
+                                                                                                   "f1_Summary":  0.3849
+                                                                                               },
+                                                              "ModernBERT response-only (old input)":  {
+                                                                                                           "threshold":  0.25,
+                                                                                                           "accuracy":  0.7385,
+                                                                                                           "precision":  0.6017,
+                                                                                                           "recall":  0.7434,
+                                                                                                           "f1":  0.6651,
+                                                                                                           "pr_auc":  0.7665,
+                                                                                                           "f1_Data2txt":  0.8422,
+                                                                                                           "f1_QA":  0.4692,
+                                                                                                           "f1_Summary":  0.3722
+                                                                                                       },
+                                                              "ModernBERT source-aware (new input)":  {
+                                                                                                          "threshold":  0.31,
+                                                                                                          "accuracy":  0.7304,
+                                                                                                          "precision":  0.5785,
+                                                                                                          "recall":  0.8399,
+                                                                                                          "f1":  0.6851,
+                                                                                                          "pr_auc":  0.7798,
+                                                                                                          "f1_Data2txt":  0.8371,
+                                                                                                          "f1_QA":  0.5359,
+                                                                                                          "f1_Summary":  0.4708
+                                                                                                      }
+                                                          },
+                       "sensitivity_presets_validation":  [
+                                                              {
+                                                                  "mode":  "Catch as many as possible",
+                                                                  "threshold":  0.25,
+                                                                  "accuracy":  0.6905,
+                                                                  "precision":  0.6067,
+                                                                  "recall":  0.8818,
+                                                                  "f1":  0.7188
+                                                              },
+                                                              {
+                                                                  "mode":  "Balanced detection",
+                                                                  "threshold":  0.31,
+                                                                  "accuracy":  0.7382,
+                                                                  "precision":  0.6671,
+                                                                  "recall":  0.8316,
+                                                                  "f1":  0.7403
+                                                              },
+                                                              {
+                                                                  "mode":  "Only flag stronger signals",
+                                                                  "threshold":  0.51,
+                                                                  "accuracy":  0.7664,
+                                                                  "precision":  0.803,
+                                                                  "recall":  0.6352,
+                                                                  "f1":  0.7093
+                                                              }
+                                                          ],
+                       "notes":  [
+                                     "Model and threshold were selected on validation only and written to selection.json before the test set was used.",
+                                     "The test set was evaluated once for the selected model; other models\u0027 test scores are reporting only.",
+                                     "Hallucination rate differs by split: train 44.5%, validation 44.9%, test 34.9%. A threshold tuned on a higher-prevalence validation set tends to lower precision on a lower-prevalence test set."
+                                 ]
+                   },
+    "hosting_note":  "model.safetensors is ~570 MB: not in git. Host on Hugging Face Hub and download at startup.",
+    "limitations":  [
+                        "Predefined samples used in the UI demo",
+                        "TODO: add dataset/threshold limitations from evaluation"
+                    ],
+    "python_version":  "3.12.10",
+    "mlflow_run_id":  null,
+    "files":  [
+                  {
+                      "path":  "selection.json",
+                      "size_mb":  0,
+                      "sha256":  "DEC41CC5110103C0A3447DAF10755CBF07D9969F648DC0924B38C26A871B36D0"
+                  },
+                  {
+                      "path":  "sentinel_config.json",
+                      "size_mb":  0,
+                      "sha256":  "A36501DA69DDABA333FE903ABCC3B2FF4F63551EDDC162D370EFB205C577BE42"
+                  },
+                  {
+                      "path":  "evaluation/confusion_matrix.png",
+                      "size_mb":  0.03,
+                      "sha256":  "0558DAF445290317A88197DC698ADA3E5ECBFB2333C7847E3A27BFBBF19B2636"
+                  },
+                  {
+                      "path":  "evaluation/evaluation_results.json",
+                      "size_mb":  0,
+                      "sha256":  "A29A017915A5548000FEE306F770094C5D42027688ECFFD1C55A11279D52CA77"
+                  },
+                  {
+                      "path":  "evaluation/model_comparison.csv",
+                      "size_mb":  0,
+                      "sha256":  "423A4954C74AB74C5FBA9F5D45ABE130722AAA703B96F2BD1A3E9B11E2A0BB2C"
+                  },
+                  {
+                      "path":  "evaluation/validation_threshold_curve.csv",
+                      "size_mb":  0,
+                      "sha256":  "AC558143385112B3C5233F3BD284CC915189E9D0264DC605CCF632DAF68E67AB"
+                  },
+                  {
+                      "path":  "model/config.json",
+                      "size_mb":  0,
+                      "sha256":  "270989448BF8CC682769D54C57FB400C094028932AEB40317435DBDDC27F83C3"
+                  },
+                  {
+                      "path":  "model/model.safetensors",
+                      "size_mb":  570.72,
+                      "sha256":  "CDAE0A343FAF333D803F3FEB8F078218065910A6CDAC9A03F11819CE2EFF9EC1"
+                  },
+                  {
+                      "path":  "model/tokenizer.json",
+                      "size_mb":  3.42,
+                      "sha256":  "C4D6854A74370769DCF674360468FEB68F80D5C14AB4E9EBE388914F1E646A34"
+                  },
+                  {
+                      "path":  "model/tokenizer_config.json",
+                      "size_mb":  0,
+                      "sha256":  "FB54F027372062B2CA52282EFB04D178A8B57167A00CD8F4E816515823A2C016"
+                  },
+                  {
+                      "path":  "model/training_args.bin",
+                      "size_mb":  0.01,
+                      "sha256":  "4DA805303D4ED0A5CD8766444D349FFEF50B6A9555313CB2AA3A27526C64B1FA"
+                  }
+              ]
+}
