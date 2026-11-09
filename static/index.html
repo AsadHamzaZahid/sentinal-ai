@@ -1304,6 +1304,15 @@
         transition-duration: .01ms !important
       }
     }
+
+    .liveResult{margin-top:14px;padding:14px 16px;border-radius:12px;border:1px solid;line-height:1.45}
+    .liveResult .liveTitle{font-size:1.2rem;font-weight:700}
+    .liveResult .liveDetail{margin-top:4px;font-size:1rem;opacity:.9}
+    .liveResult.ok{background:rgba(52,211,153,.12);border-color:rgba(52,211,153,.5);color:#6ee7b7}
+    .liveResult.warn{background:rgba(255,176,32,.12);border-color:rgba(255,176,32,.55);color:#ffb020}
+    .liveResult.err{background:rgba(255,107,94,.12);border-color:rgba(255,107,94,.55);color:var(--bad)}
+
+
   </style>
 </head>
 
@@ -1806,13 +1815,42 @@
       } catch (e) { $("nabErr").textContent = e.message; } finally { busy($("nabGo"), false, "Replay metric"); }
     };
     $("nabLive").onclick = async () => {
+      const out = $("nabLiveOut");
+      const show = (kind, title, detail) => {
+        out.className = "liveResult " + kind;
+        out.textContent = "";
+        const t = document.createElement("div");
+        t.className = "liveTitle"; t.textContent = title;
+        out.appendChild(t);
+        if (detail) {
+          const p = document.createElement("div");
+          p.className = "liveDetail"; p.textContent = detail;
+          out.appendChild(p);
+        }
+      };
       const vals = $("nabPaste").value.split(/[\s,;]+/).filter(Boolean).map(Number);
-      if (vals.length < 10 || vals.some(isNaN)) { $("nabLiveOut").textContent = "Enter at least 10 numbers."; return; }
+      if (vals.length < 10 || vals.some(isNaN)) { show("err", "Enter at least 10 numbers."); return; }
       try {
-        const d = await post("/predict/nab", { values: vals }); const last = d.flags[d.flags.length - 1];
-        $("nabLiveOut").textContent = d.anomalous_points ? `${d.anomalous_points} unusual reading(s)` + (last ? ", including the latest one." : ".") : "All readings look normal.";
+        const d = await post("/predict/nab", { values: vals });
+        const flagged = d.flags.map((f, i) => (f ? i : -1)).filter(i => i >= 0);
+        if (!flagged.length) {
+          show("ok", "✓ All readings look normal", `Checked ${vals.length} readings and nothing stands out.`);
+        } else {
+          const normal = vals.filter((_, i) => !d.flags[i]).sort((a, b) => a - b);
+          const mid = normal.length ? normal[Math.floor(normal.length / 2)] : null;
+          const lastBad = !!d.flags[d.flags.length - 1];
+          const n = flagged.length;
+          let detail = lastBad
+            ? `The latest reading (${vals[vals.length - 1]})`
+            : `Reading ${flagged[0] + 1} (${vals[flagged[0]]})`;
+          detail += mid !== null
+            ? ` is far from the usual level of about ${+mid.toFixed(2)}.`
+            : " stands out from the rest.";
+          if (n > 1) detail += ` Flagged positions: ${flagged.slice(0, 5).map(i => i + 1).join(", ")}${n > 5 ? "…" : ""}.`;
+          show("warn", `⚠ ${n} unusual reading${n > 1 ? "s" : ""} found`, detail);
+        }
         refreshAlerts();
-      } catch (e) { $("nabLiveOut").textContent = e.message; }
+      } catch (e) { show("err", e.message); }
     };
 
     /* Servers */
