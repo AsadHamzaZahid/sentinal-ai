@@ -4,8 +4,9 @@
 
 Writes:
   artifacts/smd_thresholds.json   flag threshold for every SMD machine + model (so no dataset is needed at run time)
-  artifacts/manifest.json         sha256 + size of every model file, library versions, build time
-Re-run whenever a model file changes."""
+  artifacts/manifest.json         sha256 + size of every tracked file (SMD models + RAGTruth samples), library versions, build time
+Re-run whenever a tracked file changes. The 285 MB RAGTruth FP16 model is no longer packaged;
+the deployed RAGTruth demo uses data/demo/ragtruth_samples.json (see scripts/export_ragtruth_samples.py)."""
 import hashlib
 import json
 import sys
@@ -50,11 +51,11 @@ def main_build():
     (main.ARTIFACTS / "smd_thresholds.json").write_text(json.dumps(thresholds, indent=2))
 
     tracked = sorted(main.SMD_DIR.glob("*.joblib"))
-    for name in ("config.json", "model.safetensors", "tokenizer.json", "tokenizer_config.json", "sentinel_config.json"):
-        for base in (main.MODEL_DIR, main.ROOT):
-            if (base / name).exists():
-                tracked.append(base / name)
-                break
+    if main.RAG_SAMPLES.exists():
+        tracked.append(main.RAG_SAMPLES)
+    else:
+        print(
+            f"WARNING: {main.RAG_SAMPLES} not found. Run scripts/export_ragtruth_samples.py first.")
     files = {}
     for p in tracked:
         print(f"hashing {p.name} ...")
@@ -64,7 +65,8 @@ def main_build():
     manifest = {
         "created_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "smd_threshold_rule": "95th percentile of test scores (subsampled to ~5000 rows); 99th percentile of train scores if no test data",
-        "libraries": {k: version(k) for k in ("scikit-learn", "numpy", "pandas", "joblib", "torch", "transformers", "fastapi")},
+        "ragtruth_deployment": "precomputed samples (no live model packaged)",
+        "libraries": {k: version(k) for k in ("scikit-learn", "numpy", "pandas", "joblib", "fastapi")},
         "files": files,
     }
     (main.ARTIFACTS / "manifest.json").write_text(json.dumps(manifest, indent=2))

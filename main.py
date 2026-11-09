@@ -1,14 +1,10 @@
 """SentinelAI API (RAGTruth + NAB + SMD).  Run from the project root:  uvicorn main:app --reload
 
-Expected layout (your current one):
-  SentinalAI/
-    main.py, static/index.html
-    SentinelAI_final/            RAGTruth model (+ sentinel_config.json) -> else MOCK mode
-    sentinel_config.json         also accepted from the project root
-    smd_outputs/machine-1-X_models.joblib
-    OmniAnomaly-master/ServerMachineDataset/{train,test,test_label}/machine-1-X.txt
-    NAB_outputs/prepared/scored_*.csv
-Every engine falls back gracefully if its files are missing."""
+RAGTruth modes (env RAGTRUTH_MODE = live | precomputed | auto, default auto):
+  live         load the trained ModernBERT model (needs torch + transformers, see requirements-live.txt)
+  precomputed  serve stored predictions from data/demo/ragtruth_samples.json (no torch, light deployment)
+  auto         live if the model files exist, otherwise precomputed if the samples file exists, otherwise mock
+NAB and SMD are unchanged. Every engine falls back gracefully if its files are missing."""
 import ast
 import json
 import logging
@@ -26,7 +22,6 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
-# AFTER
 ROOT = Path(__file__).parent
 MODELS = Path(os.getenv("SENTINEL_MODELS_DIR", ROOT / "models"))
 MODEL_DIR = Path(os.getenv("SENTINEL_MODEL_DIR", MODELS /
@@ -36,17 +31,22 @@ SMD_DATA = ROOT / "OmniAnomaly-master" / "ServerMachineDataset"
 NAB_DIR = ROOT / "NAB_outputs" / "prepared"
 # thresholds + manifest written by scripts/build_artifacts.py
 ARTIFACTS = ROOT / "artifacts"
+# precomputed RAGTruth predictions written by scripts/export_ragtruth_samples.py
+RAG_SAMPLES = Path(os.getenv("SENTINEL_RAG_SAMPLES",
+                   ROOT / "data" / "demo" / "ragtruth_samples.json"))
+RAGTRUTH_MODE = os.getenv("RAGTRUTH_MODE", "auto").lower()
 
 logging.basicConfig(level=logging.INFO,
                     format="%(asctime)s %(levelname)s %(message)s")
 log = logging.getLogger("sentinelai")
 
 TASKS = {"Summary", "QA", "Data2txt"}
-DEFAULT_PRESETS = {"Catch as many as possible": 0.30,
-                   "Balanced detection": 0.50, "Only flag stronger signals": 0.70}
+DEFAULT_PRESETS = {"Catch as many as possible": 0.25,
+                   "Balanced detection": 0.31, "Only flag stronger signals": 0.51}
 
-state = {"mode": "mock", "cfg": {},
-         "tok": None, "model": None, "device": "cpu"}
+# mode: "model" (live) | "precomputed" | "mock"
+state = {"mode": "mock", "cfg": {}, "tok": None, "model": None, "device": "cpu",
+         "samples": [], "samples_meta": {}}
 # loaded joblib bundles + calibrated thresholds
 smd = {"bundles": {}, "cache": {}}
 alerts: deque = deque(maxlen=200)
@@ -70,7 +70,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(title="SentinelAI", version="2.1", lifespan=lifespan)
+app = FastAPI(title="SentinelAI", version="2.2", lifespan=lifespan)
 
 
 @app.middleware("http")
@@ -86,24 +86,51 @@ async def log_requests(request, call_next):
     return response
 
 
+def load_ragtruth_samples():
+    if RAG_SAMPLES.exists():
+        data = json.loads(RAG_SAMPLES.read_text(encoding="utf-8"))
+        state["samples"] = data.get("samples", [])
+        state["samples_meta"] = data.get("meta", {})
+        log.info("[RAGTruth] Loaded %d precomputed samples",
+                 len(state["samples"]))
+
+
 def load_ragtruth():
+    load_ragtruth_samples()
     cfg_path = next((p for p in (MODEL_DIR / "sentinel_config.json",
                     MODEL_DIR.parent / "sentinel_config.json",
                     ROOT / "sentinel_config.json") if p.exists()), None)
-    if not (cfg_path and (MODEL_DIR / "config.json").exists()):
-        print(f"[RAGTruth] No model in '{MODEL_DIR}'. MOCK mode.")
+    model_ok = bool(cfg_path and (MODEL_DIR / "config.json").exists())
+
+    if RAGTRUTH_MODE in ("live", "auto") and model_ok:
+        import torch  # only imported in live mode, so deployments never need it
+        from transformers import AutoModelForSequenceClassification, AutoTokenizer
+        state["cfg"] = json.loads(cfg_path.read_text())
+        state["tok"] = AutoTokenizer.from_pretrained(MODEL_DIR)
+        # low-memory servers: keep weights in bfloat16 (half the RAM of float32)
+        dtype = torch.bfloat16 if os.getenv(
+            "SENTINEL_LOW_MEMORY") == "1" else torch.float32
+        state["model"] = AutoModelForSequenceClassification.from_pretrained(
+            MODEL_DIR, dtype=dtype).eval()
+        state["device"] = "cuda" if torch.cuda.is_available() else "cpu"
+        state["model"].to(state["device"])
+        state["mode"] = "model"
+        print(
+            f"[RAGTruth] Loaded {state['cfg'].get('selected_model')} on {state['device']} ({dtype}).")
         return
-    import torch
-    from transformers import AutoModelForSequenceClassification, AutoTokenizer
-    state["cfg"] = json.loads(cfg_path.read_text())
-    state["tok"] = AutoTokenizer.from_pretrained(MODEL_DIR)
-    state["model"] = AutoModelForSequenceClassification.from_pretrained(
-        MODEL_DIR, dtype=torch.float32).eval()
-    state["device"] = "cuda" if torch.cuda.is_available() else "cpu"
-    state["model"].to(state["device"])
-    state["mode"] = "model"
-    print(
-        f"[RAGTruth] Loaded {state['cfg'].get('selected_model')} on {state['device']}.")
+
+    if RAGTRUTH_MODE == "live":
+        log.warning(
+            "[RAGTruth] RAGTRUTH_MODE=live but no model in '%s'; falling back.", MODEL_DIR)
+    if state["samples"]:
+        meta = state["samples_meta"]
+        state["cfg"] = {"selected_model": meta.get("model"),
+                        "sensitivity_presets": meta.get("sensitivity_presets", DEFAULT_PRESETS)}
+        state["mode"] = "precomputed"
+        print("[RAGTruth] PRECOMPUTED demo mode (no live model).")
+    else:
+        print(
+            f"[RAGTruth] No model in '{MODEL_DIR}' and no samples file. MOCK mode.")
 
 
 def load_smd():
@@ -168,6 +195,23 @@ class PredictIn(BaseModel):
     response: str = Field(..., min_length=1)
     dataset_name: str = ""
     sensitivity_mode: str = "Balanced detection"
+    sample_id: Optional[str] = None  # used by the precomputed demo
+
+
+def find_sample(item: PredictIn) -> Optional[dict]:
+    if item.sample_id:
+        s = next((s for s in state["samples"]
+                 if s["id"] == item.sample_id), None)
+        if s is None:
+            raise HTTPException(404, f"Unknown sample_id '{item.sample_id}'")
+        return s
+
+    def norm(t):
+        return " ".join(t.split())
+    return next((s for s in state["samples"]
+                 if s["task_type"] == item.task_type
+                 and norm(s["source_info"]) == norm(item.source_info)
+                 and norm(s["response"]) == norm(item.response)), None)
 
 
 def predict_one(item: PredictIn) -> dict:
@@ -176,15 +220,28 @@ def predict_one(item: PredictIn) -> dict:
     if item.sensitivity_mode not in presets():
         raise HTTPException(
             422, f"sensitivity_mode must be one of {list(presets())}")
-    prob = score_text(item.task_type, item.source_info,
-                      item.response, item.dataset_name)
+    sample = None
+    if state["mode"] == "precomputed":
+        sample = find_sample(item)
+        if sample is None:
+            raise HTTPException(422, "This deployment is a precomputed demo: live scoring is disabled. "
+                                     "Select one of the provided samples (GET /ragtruth/samples).")
+        prob = float(sample["probability"])
+    else:
+        prob = score_text(item.task_type, item.source_info,
+                          item.response, item.dataset_name)
     thr = presets()[item.sensitivity_mode]
     flagged = prob >= thr
     if flagged:
         push_alert("hallucination", prob, thr,
                    f"{item.task_type} response likely hallucinated ({prob:.0%})")
-    return {"hallucinated": flagged, "probability": round(prob, 4), "threshold": thr,
-            "sensitivity_mode": item.sensitivity_mode, "engine": state["mode"]}
+    out = {"hallucinated": flagged, "probability": round(prob, 4), "threshold": thr,
+           "sensitivity_mode": item.sensitivity_mode, "engine": state["mode"],
+           "precomputed": state["mode"] == "precomputed"}
+    if sample:
+        out["sample"] = {"id": sample["id"], "true_label": sample["true_label"],
+                         "category": sample["category"]}
+    return out
 
 
 # ---------------------------------------------------------------- SMD engine
@@ -325,7 +382,18 @@ def health():
 
 @app.get("/modes")
 def modes():
-    return {"modes": presets(), "tasks": sorted(TASKS), "engine": state["mode"]}
+    pre = state["mode"] == "precomputed"
+    return {"modes": presets(), "tasks": sorted(TASKS), "engine": state["mode"],
+            "precomputed": pre, "free_text": not pre,
+            "notice": ("Pre-computed demo: this deployment does not run the ModernBERT model live. "
+                       "Pick one of the samples below. Their scores come from the trained model, "
+                       "computed offline.") if pre else None}
+
+
+@app.get("/ragtruth/samples")
+def ragtruth_samples():
+    return {"engine": state["mode"], "precomputed": state["mode"] == "precomputed",
+            "meta": state["samples_meta"], "samples": state["samples"]}
 
 
 @app.post("/predict")

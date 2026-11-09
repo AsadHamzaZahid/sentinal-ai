@@ -16,7 +16,10 @@ mlruns/
 mlartifacts/
 
 # Raw datasets and cloned upstream repos
-data/
+data/*
+!data/demo/
+data/demo/*
+!data/demo/ragtruth_samples.json
 NAB-master/
 OmniAnomaly-master/
 RAGTruth-main/
@@ -46,3 +49,4 @@ models/ragtruth/v0.1.0/model/
 *.bin
 *.pt
 *.h5
+models/ragtruth/

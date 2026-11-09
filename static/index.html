@@ -1211,6 +1211,93 @@
       font-size: .9rem
     }
 
+    /* ---- pre-computed demo alert (siren + red robot) ---- */
+    #siren {
+      position: fixed;
+      inset: 0;
+      z-index: 90;
+      pointer-events: none;
+      opacity: 0;
+      background: radial-gradient(ellipse at center, transparent 35%, rgba(255, 30, 30, .6))
+    }
+
+    #siren.on {
+      animation: sirenflash .6s ease-in-out infinite alternate
+    }
+
+    #siren .bc {
+      position: absolute;
+      top: 0;
+      width: 110px;
+      height: 60px;
+      background: radial-gradient(ellipse at 50% 0, #ff3b30, transparent 70%)
+    }
+
+    #siren .bc.l {
+      left: 10%
+    }
+
+    #siren .bc.r {
+      right: 10%
+    }
+
+    @keyframes sirenflash {
+      from {
+        opacity: .15
+      }
+
+      to {
+        opacity: 1
+      }
+    }
+
+    .guide.alert {
+      display: none;
+      align-items: center;
+      background: rgba(255, 107, 94, .08);
+      border: 1px solid var(--bad);
+      border-radius: 10px;
+      padding: 10px 12px
+    }
+
+    .guide.alert .bot {
+      color: var(--bad);
+      animation: bob .5s ease-in-out infinite
+    }
+
+    .guide.alert.in {
+      animation: popin .5s
+    }
+
+    @keyframes popin {
+      from {
+        transform: translateX(-40px);
+        opacity: 0
+      }
+
+      to {
+        transform: none;
+        opacity: 1
+      }
+    }
+
+    #alertBub {
+      flex: 1;
+      opacity: 1;
+      transform: none;
+      border-bottom-color: var(--bad);
+      font-size: .9rem
+    }
+
+    .notice {
+      background: rgba(255, 107, 94, .12);
+      border: 1px solid var(--bad);
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 14px;
+      font-size: .9rem
+    }
+
     @media (prefers-reduced-motion:reduce) {
       * {
         animation: none !important;
@@ -1235,7 +1322,7 @@
       <rect x="24" y="48" width="6" height="8" fill="currentColor" />
     </symbol>
   </svg>
-
+  <div id="siren"><i class="bc l"></i><i class="bc r"></i></div>
   <div id="gate">
     <div id="slab"><b class="col"></b><b class="tri"></b><b class="lamp"></b><span id="gdest"></span></div>
   </div>
@@ -1364,6 +1451,11 @@
           </svg></div>
         <div class="z-smd" id="racks"></div>
       </div>
+      <div class="guide alert" id="alertGuide"><svg class="bot">
+          <use href="#bot" />
+        </svg>
+        <div class="bub" id="alertBub"></div>
+      </div>
 
       <div class="guide">
         <svg class="bot">
@@ -1374,6 +1466,7 @@
 
       <!-- RAGTruth -->
       <section class="panel on card" id="rag">
+        <div class="notice" id="ragNotice" style="display:none"></div>
         <div class="samples" id="smpRag"></div>
         <div class="row">
           <div><label for="task">Task type</label><select id="task"></select></div>
@@ -1492,11 +1585,45 @@
       smd: ["I’m replaying samples from a dataset, not watching a live server.", "I only know 3 machines, and I’m only fair at spotting trouble on them.", "About 5% of rows get flagged by design, so some alerts are just the rule."],
       nab: ["I’m showing saved scores, not running my trained models live.", "My live mode is a simple rolling average check.", "Only a few of these series gave credible results, so don’t over-trust me."]
     };
+
+    let RAGPRE = false, curSample = null;
+    const ALERT_TXT = "ALERT: this is a pre-computed demo. You are replaying saved predictions from the trained ModernBERT model. The model was too heavy to deploy online, so it cannot score new text here. Want the live version? Run the project on your own computer with the model files and it scores any text you paste.";
+    function sirenSound(ms) { for (let i = 0; i < Math.ceil(ms / 500); i++) tone("sawtooth", i % 2 ? 950 : 600, i % 2 ? 600 : 950, .5, .05, i * .5); }
+    function alertIntro(z, tok) {
+      const ag = $("alertGuide"); ag.style.display = "none"; ag.classList.remove("in"); $("siren").classList.remove("on");
+      if (z !== "rag" || !RAGPRE) return 0;
+      const total = 1300 + ALERT_TXT.length * 32;   // when typing finishes
+      setTimeout(() => {
+        if (tok !== seq) return;
+        $("siren").classList.add("on"); sirenSound(total - 700);
+        ag.style.display = "flex"; ag.classList.add("in");
+        setTimeout(() => { if (tok === seq) type($("alertBub"), ALERT_TXT, tok); }, 600);
+      }, 700);
+      setTimeout(() => $("siren").classList.remove("on"), total + 300);
+      return total;   // your 3 bubbles start 1 s after this
+    }
+    async function setupRag() {
+      try {
+        const m = await api("/modes"); RAGPRE = !!m.precomputed; if (!RAGPRE) return;
+        const n = $("ragNotice"); n.textContent = m.notice || "Pre-computed demo: pick a sample below."; n.style.display = "block";
+        const d = await api("/ragtruth/samples");
+        $("source").readOnly = $("response").readOnly = true;
+        $("source").placeholder = $("response").placeholder = "Select a sample above to load it here.";
+        $("task").disabled = true; $("ragGo").style.display = "none";
+        const TAG = { TP: ["hallucination caught", "ok"], TN: ["clean, correct", "ok"], FP: ["false alarm", "warn"], FN: ["missed by the model", "warn"] };
+        chips("smpRag", d.samples.map(s => ({
+          l: `${s.task_type} #${s.id.split("-")[1]}`, tag: (TAG[s.category] || [])[0], k: (TAG[s.category] || [])[1],
+          f: () => { curSample = s.id; $("task").value = s.task_type; $("source").value = s.source_info; $("response").value = s.response; $("ragGo").click(); follow("ragOut"); }
+        })));
+        $("mode").addEventListener("change", () => { if (curSample) $("ragGo").click(); });
+      } catch (e) { }
+    }
     function enter(z) {
       const tok = ++seq; document.documentElement.dataset.zone = z; root = ZR[z];
       showTab(document.querySelector(`.tab[data-tab=${z}]`));
       const b = $("bubbles"); b.innerHTML = LIM[z].map(() => "<div class='bub'></div>").join("");
-      [...b.children].forEach((el, i) => { el.textContent = LIM[z][i]; setTimeout(() => { if (tok === seq) { el.classList.add("on"); chirp(); } }, 1000 + i * 2600); });
+      const off = alertIntro(z, tok);
+      [...b.children].forEach((el, i) => { el.textContent = LIM[z][i]; setTimeout(() => { if (tok === seq) { el.classList.add("on"); chirp(); } }, 1000 + off + i * 2600); });
     }
     $("racks").innerHTML = Array.from({ length: 10 }, (_, i) => `<b class="rk">${[0, 1, 2, 3].map(j => `<i style="animation-delay:-${((i * 7 + j * 3) % 16) / 10}s"></i>`).join("")}</b>`).join("");
     const tree = $("tree"), grow = () => {
@@ -1637,11 +1764,12 @@
     async function init() {
       try {
         const h = await api("/health"), e = h.engines;
-        $("status").textContent = `AI responses: ${e.ragtruth === "mock" ? "demo mode (no trained model found, scores are placeholders)" : "trained model ready"}  |  Servers: ${e.smd}  |  Metrics: ${e.nab}`;
+        $("status").textContent = `AI responses: ${e.ragtruth === "mock" ? "demo mode (no trained model found, scores are placeholders)" : e.ragtruth === "precomputed" ? "pre-computed demo (stored predictions from the trained model)" : "trained model ready"}  |  Servers: ${e.smd}  |  Metrics: ${e.nab}`;
         const m = await api("/modes");
         $("task").innerHTML = m.tasks.map(t => `<option>${t}</option>`).join("");
         $("mode").innerHTML = Object.keys(m.modes).map(k => `<option ${k === "Balanced detection" ? "selected" : ""}>${k}</option>`).join("");
       } catch (e) { $("status").textContent = "Cannot reach the API. Is the server running?"; return; }
+      await setupRag();
       try { const s = await api("/nab/series"); $("nabSeries").innerHTML = s.series.map(x => `<option>${x}</option>`).join("") || "<option disabled>No recorded metrics found</option>"; nabChips(s.series); } catch (e) { }
       try { window.machines = await api("/smd/machines"); $("smdMachine").innerHTML = Object.keys(machines).map(x => `<option>${x}</option>`).join("") || "<option disabled>No server models found</option>"; fillModels(); } catch (e) { }
       refreshAlerts(); setInterval(refreshAlerts, 8000);
@@ -1652,14 +1780,14 @@
     /* AI responses */
     $("ragGo").onclick = async () => {
       $("ragErr").textContent = "";
-      const body = { task_type: $("task").value, source_info: $("source").value.trim(), response: $("response").value.trim(), sensitivity_mode: $("mode").value };
+      const body = { task_type: $("task").value, source_info: $("source").value.trim(), response: $("response").value.trim(), sensitivity_mode: $("mode").value, sample_id: RAGPRE ? curSample : null };
       if (!body.source_info || !body.response) { $("ragErr").textContent = "Fill in both the source and the response."; return; }
       busy($("ragGo"), true);
       try {
         const d = await post("/predict", body), v = $("verdict");
         v.textContent = d.hallucinated ? "Likely hallucinated" : "Looks supported by the source"; v.className = "verdict " + (d.hallucinated ? "bad" : "good");
         $("fill").style.width = d.probability * 100 + "%"; $("mark").style.left = d.threshold * 100 + "%";
-        $("ragMeta").textContent = `Hallucination probability ${(d.probability * 100).toFixed(1)}%, flag threshold ${(d.threshold * 100).toFixed(0)}% (${d.sensitivity_mode})` + (d.engine === "mock" ? ", demo scores" : "");
+        $("ragMeta").textContent = `Hallucination probability ${(d.probability * 100).toFixed(1)}%, flag threshold ${(d.threshold * 100).toFixed(0)}% (${d.sensitivity_mode})` + (d.engine === "mock" ? ", demo scores" : "") + (d.sample ? `. Ground truth: ${d.sample.true_label ? "hallucinated" : "supported"} (${d.sample.category}). Stored prediction, computed offline.` : "");
         $("ragOut").style.display = "block"; refreshAlerts();
       } catch (e) { $("ragErr").textContent = e.message; } finally { busy($("ragGo"), false, "Check response"); }
     };
