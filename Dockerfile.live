@@ -1,0 +1,30 @@
+FROM python:3.12.10-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    RAGTRUTH_MODE=live \
+    SENTINEL_MODEL_DIR=/app/models/ragtruth/v0.1.0/model_fp16
+
+WORKDIR /app
+
+RUN python -m pip install --upgrade pip
+
+RUN python -m pip install \
+    torch==2.14.1+cpu \
+    --extra-index-url https://download.pytorch.org/whl/cpu
+
+COPY requirements.live.txt .
+RUN python -m pip install -r requirements.live.txt
+
+COPY main.py .
+COPY sentinel_config.json .
+COPY static/ ./static/
+COPY models/smd/ ./models/smd/
+COPY NAB_outputs/prepared/ ./NAB_outputs/prepared/
+COPY data/demo/ragtruth_samples.json ./data/demo/ragtruth_samples.json
+COPY artifacts/ ./artifacts/
+
+EXPOSE 8000
+
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

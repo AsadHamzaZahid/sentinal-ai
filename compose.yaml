@@ -1,0 +1,13 @@
+services:
+  sentinelai:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sentinelai-api
+    ports:
+      - "8000:8000"
+    environment:
+      RAGTRUTH_MODE: precomputed
+    volumes:
+      - ./OmniAnomaly-master/ServerMachineDataset:/app/OmniAnomaly-master/ServerMachineDataset:ro
+    restart: unless-stopped

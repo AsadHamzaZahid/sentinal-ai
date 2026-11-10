@@ -50,3 +50,4 @@ models/ragtruth/v0.1.0/model/
 *.pt
 *.h5
 models/ragtruth/
+mlflow.db

@@ -1,13 +1,12 @@
 {
-  "created_at": "2026-11-08T13:13:06+00:00",
+  "created_at": "2026-11-09T17:30:43+00:00",
   "smd_threshold_rule": "95th percentile of test scores (subsampled to ~5000 rows); 99th percentile of train scores if no test data",
+  "ragtruth_deployment": "precomputed samples (no live model packaged)",
   "libraries": {
     "scikit-learn": "1.6.1",
     "numpy": "2.4.0",
     "pandas": "2.3.3",
     "joblib": "1.5.3",
-    "torch": "2.13.0",
-    "transformers": "5.14.1",
     "fastapi": "0.137.1"
   },
   "files": {
@@ -23,25 +22,9 @@
       "sha256": "ccc2fc60cd9580d54236ddeeef3355aaf46b8631d8be4c687200750ac8676cb8",
       "bytes": 3261895
     },
-    "models\\ragtruth\\v0.1.0\\model_fp16\\config.json": {
-      "sha256": "300ff5ad33ea40741cab67affd8062652153d57899ff2962adf388510cd037a0",
-      "bytes": 2045
-    },
-    "models\\ragtruth\\v0.1.0\\model_fp16\\model.safetensors": {
-      "sha256": "901d6fef577995d9c46ac0bcf776b7c4fdcca43abe052055167d5ef80b6a3b93",
-      "bytes": 299226948
-    },
-    "models\\ragtruth\\v0.1.0\\model_fp16\\tokenizer.json": {
-      "sha256": "c4d6854a74370769dcf674360468feb68f80d5c14ab4e9ebe388914f1e646a34",
-      "bytes": 3583327
-    },
-    "models\\ragtruth\\v0.1.0\\model_fp16\\tokenizer_config.json": {
-      "sha256": "a969705c23d8d47f67d09db23b86bf314b2c1a44ed102157b147a0924901493f",
-      "bytes": 509
-    },
-    "sentinel_config.json": {
-      "sha256": "a36501da69ddaba333fe903abcc3b2ff4f63551eddc162d370efb205c577be42",
-      "bytes": 1041
+    "data\\demo\\ragtruth_samples.json": {
+      "sha256": "e1803a33f4c23a8bfc2ec46e0fcdcfe40b0c4ccf0b0008b904fc6a6355007ab1",
+      "bytes": 26526
     }
   }
 }

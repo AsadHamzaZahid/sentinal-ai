@@ -1,0 +1,18 @@
+services:
+  sentinelai-live:
+    build:
+      context: .
+      dockerfile: Dockerfile.live
+    container_name: sentinelai-live
+    ports:
+      - "8001:8000"
+    environment:
+      RAGTRUTH_MODE: live
+      SENTINEL_MODEL_DIR: /app/models/ragtruth/v0.1.0/model_fp16
+    volumes:
+      - ./model.safetensors:/app/models/ragtruth/v0.1.0/model_fp16/model.safetensors:ro
+      - ./config.json:/app/models/ragtruth/v0.1.0/model_fp16/config.json:ro
+      - ./tokenizer.json:/app/models/ragtruth/v0.1.0/model_fp16/tokenizer.json:ro
+      - ./tokenizer_config.json:/app/models/ragtruth/v0.1.0/model_fp16/tokenizer_config.json:ro
+      - ./OmniAnomaly-master/ServerMachineDataset:/app/OmniAnomaly-master/ServerMachineDataset:ro
+    restart: unless-stopped
