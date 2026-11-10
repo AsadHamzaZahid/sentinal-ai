@@ -1,16 +1,15 @@
 # 🛡️ SentinelAI
 
+**🌐 Live Application: https://sentinalai.fastapicloud.dev/**
+
 **An AI-powered hallucination detection and time-series anomaly monitoring platform.**
 
-SentinelAI is a FastAPI-based application designed to help identify potentially hallucinated AI-generated responses and detect unusual patterns in time-series data. It combines a RAGTruth-based hallucination detection pipeline with anomaly detection capabilities using the Server Machine Dataset (SMD) and Numenta Anomaly Benchmark (NAB).
+SentinelAI is a FastAPI-based application designed to help identify potentially hallucinated AI-generated responses and detect unusual patterns in time-series data.
 
-The project provides separate demo and live Docker deployments, API access, interactive API documentation, and automated CI/CD workflows through GitHub Actions.
-
-## 🌐 Live Application
+## 🔗 Project Links
 
 | Resource | Link |
 |---|---|
-| Live application | https://sentinalai.fastapicloud.dev/ |
 | API documentation | https://sentinalai.fastapicloud.dev/docs |
 | GitHub repository | https://github.com/AsadHamzaZahid/sentinal-ai |
 | Demo Docker image | https://github.com/AsadHamzaZahid/sentinal-ai/pkgs/container/sentinelai-demo |
