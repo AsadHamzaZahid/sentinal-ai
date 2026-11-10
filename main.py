@@ -119,6 +119,12 @@ def load_ragtruth():
             f"[RAGTruth] Loaded {state['cfg'].get('selected_model')} on {state['device']} ({dtype}).")
         return
 
+    if RAGTRUTH_MODE == "mock":
+        state["cfg"] = {"sensitivity_presets": DEFAULT_PRESETS}
+        state["mode"] = "mock"
+        print("[RAGTruth] MOCK mode (forced by configuration).")
+        return
+
     if RAGTRUTH_MODE == "live":
         log.warning(
             "[RAGTruth] RAGTRUTH_MODE=live but no model in '%s'; falling back.", MODEL_DIR)
